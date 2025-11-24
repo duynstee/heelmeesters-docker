@@ -23,7 +23,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__{{JouwConnectieNaam}}=Server=db;Database={{Jouwdatabasenaam}};User=sa;Password={{Jouw wachtwoord}};TrustServerCertificate=True;Encrypt=True
     # Do not publish backend directly; proxy will route /api to this service
-  carsclient:
+  client:
     build:
       context: ./Client
       dockerfile: Dockerfile
