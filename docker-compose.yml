@@ -1,27 +1,27 @@
 services:
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+  proxy:
+    image: nginx:stable-alpine
+    container_name: team-{{Jouw groepsletter}}
     environment:
-      SA_PASSWORD: "{{Jouw wachtwoord}}"
-      ACCEPT_EULA: "Y"
-    healthcheck:
-      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/1433"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      - VIRTUAL_HOST=team-{{Jouw groepsletter}}.atd.avans.nl
+      - VIRTUAL_PORT=80
     volumes:
-      - mssqldata:/var/opt/mssql
-
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      web:
+        condition: service_started
+      client:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - team-{{Jouw groepsletter}}-network
+      - proxy
   web:
     build:
       context: ./Server
       dockerfile: Dockerfile
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__{{JouwConnectieNaam}}=Server=db;Database={{Jouwdatabasenaam}};User=sa;Password={{Jouw wachtwoord}};TrustServerCertificate=True;Encrypt=True
+      - ConnectionStrings__MyConnection=${ConnectionStrings__MyConnection}
     # Do not publish backend directly; proxy will route /api to this service
   client:
     build:
@@ -29,19 +29,12 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - web
+    networks:
+      - team-{{Jouw groepsletter}}-network
     # Do not publish frontend directly; proxy will serve the frontend on host port 80
     restart: unless-stopped
+networks:
+  team-{{Jouw groepsletter}}-network:
+    external: true
   proxy:
-    image: nginx:stable-alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      web:
-        condition: service_started
-      carsclient:
-        condition: service_started
-    restart: unless-stopped
-volumes:
-  mssqldata:
+    external: true

@@ -22,28 +22,29 @@ Deze repository bevat een startpunt voor een fullstack-project met Docker:
 De volgende placeholders komen in de repository voor. Vervang ze allemaal met je eigen waarden.
 
 - `{{Jouw WebAppFileNaam}}`
-	- Bestanden: `Server/Dockerfile`, `Server/Program.cs` (indirect via dll naam)
-	- Beschrijving: de naam van je ASP.NET projectbestand (zonder extensie bij sommige verwijzingen). Bijvoorbeeld `MyWebApp` als je `MyWebApp.csproj` en `MyWebApp.dll` hebt.
-
-- `{{Eventueel locaties van andere dll projecten}}`
 	- Bestand: `Server/Dockerfile`
-	- Beschrijving: optionele extra project- of bibliotheek-paden die je wil kopiëren (als je meerdere projecten hebt).
+	- Beschrijving: de naam van je ASP.NET projectbestand (zonder extensie). Bijvoorbeeld `MyWebApp` als je `MyWebApp.csproj` hebt.
 
-- `{{Locatie die je gebruikt in je WebApp}}`
-	- Bestand: `Server/Dockerfile`
-	- Beschrijving: doelmap/relatieve pad in de buildcontext die je in je Dockerfile gebruikt.
+- `{{Jouw groepsletter}}`
+	- Bestanden: `.env`, `docker-compose.yml`
+	- Beschrijving: de letter van jouw groep (bijv. `A`, `B`, etc.). Dit wordt gebruikt voor de database en domeinnamen.
 
 - `{{JouwConnectieNaam}}`
-	- Bestanden: `Server/Program.cs`, `docker-compose.yml`
+	- Bestanden: `Server/Program.cs`, `docker-compose.dev.yml`
 	- Beschrijving: de naam van de connection string zoals gebruikt in je appsettings (bv. `DefaultConnection` of `AppDb`).
 
+- `{{Jouw context hier}}`
+	- Bestand: `Server/Program.cs`
+	- Beschrijving: de naam van je DbContext klasse (bijv. `MyDbContext`).
+
 - `{{Jouw wachtwoord}}`
-	- Bestand: `docker-compose.yml`
+	- Bestanden: `.env`, `docker-compose.dev.yml`
 	- Beschrijving: sterk SA-wachtwoord voor de MSSQL container. Moet voldoen aan SQL Server password policy (minimaal 8 tekens, hoofdletter, kleine letter, cijfer en speciaal teken).
+	Voor dev kan je zelf je wachtwoord kiezen, voor acceptatie en productie krijg je van ons je wachtwoord.
 
 - `{{Jouwdatabasenaam}}`
-	- Bestand: `docker-compose.yml`
-	- Beschrijving: de naam van de database die je wilt gebruiken/aanmaken.
+	- Bestand: `docker-compose.dev.yml`
+	- Beschrijving: de naam van de database die je wilt gebruiken/aanmaken (voor lokaal ontwikkelen).
 
 
 Zorg dat je elk van bovenstaande placeholders vervangt voordat je de containers opstart.
@@ -53,7 +54,7 @@ Zorg dat je elk van bovenstaande placeholders vervangt voordat je de containers 
 
 1. Installeer en start Docker Desktop (met WSL2 backend of Windows containers indien je dat nodig hebt).
 
-2. Open een PowerShell venster en ga naar de projectmap (de map waar `docker-compose.yml` staat):
+2. Open een PowerShell venster en ga naar de projectmap (de map waar `docker-compose.dev.yml` staat):
 
 ```powershell
 cd "c:\Users\Martijn\Desktop\Fullstack-project-met-Docker"
@@ -61,9 +62,11 @@ cd "c:\Users\Martijn\Desktop\Fullstack-project-met-Docker"
 
 3. Vervang alle `{{...}}` placeholders in de repository met jouw waarden. Belangrijke bestanden om aan te passen:
 
-- `Server/Dockerfile` — zet hier de juiste projectnaam en eventuele extra projectkopieën.
-- `Server/Program.cs` — zorg dat de ConnectionStrings omgeving-variabele overeenkomt met `{{JouwConnectieNaam}}`.
-- `docker-compose.yml` — vul `{{Jouw wachtwoord}}`, `{{Jouwdatabasenaam}}` en `{{JouwConnectieNaam}}` in.
+- `Server/Dockerfile` — zet hier de juiste projectnaam.
+- `Server/Program.cs` — vul de juiste connection string naam en DbContext in.
+- `.env` — vul `{{Jouw groepsletter}}` en `{{Jouw wachtwoord}}` in.
+- `docker-compose.yml` — vul `{{Jouw groepsletter}}` in.
+- `docker-compose.dev.yml` — vul `{{Jouw wachtwoord}}`, `{{Jouwdatabasenaam}}` en `{{JouwConnectieNaam}}` in.
 
 Tip: gebruik een teksteditor of VS Code zoek-en-vervang om alle `{{` te vinden.
 
