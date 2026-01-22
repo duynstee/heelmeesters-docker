@@ -2,10 +2,10 @@ services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      SA_PASSWORD: "{{Jouw wachtwoord}}"
+      SA_PASSWORD: "SterkWachtwoord!1"
       ACCEPT_EULA: "Y"
     healthcheck:
-      test: [ "CMD", "bash", "-c", "echo > /dev/tcp/localhost/1433" ]
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/localhost/1433"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -21,16 +21,17 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__{{JouwConnectieNaam}}=Server=db;Database={{Jouwdatabasenaam}};User=sa;Password={{Jouw wachtwoord}};TrustServerCertificate=True;Encrypt=True
+      - ConnectionStrings__DefaultConnection=Server=db;Database=DZH;User Id=sa;Password=SterkWachtwoord!1;TrustServerCertificate=True;Encrypt=True
     # Do not publish backend directly; proxy will route /api to this service
+
   client:
     build:
       context: ./Client
       dockerfile: Dockerfile
     depends_on:
       - web
-    # Do not publish frontend directly; proxy will serve the frontend on host port 80
     restart: unless-stopped
+
   proxy:
     image: nginx:stable-alpine
     ports:
@@ -43,5 +44,6 @@ services:
       client:
         condition: service_started
     restart: unless-stopped
+
 volumes:
   mssqldata:
