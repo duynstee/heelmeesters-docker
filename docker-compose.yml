@@ -20,7 +20,7 @@ services:
       context: ./Server
       dockerfile: Dockerfile
     environment:
-      - ConnectionStrings__MyConnection=${ConnectionStrings__MyConnection}
+      - ConnectionStrings__MyConnection=${ConnectionStrings__DefaultConnection}
     restart: unless-stopped
     networks:
       - my-project-network
