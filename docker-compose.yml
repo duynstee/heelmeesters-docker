@@ -37,7 +37,7 @@ services:
 
 networks:
   my-project-network:
-    name: acc.team-j-network
+    name: team-j-network
     external: true
   proxy:
     external: true
