@@ -8,7 +8,7 @@
 <script setup>
 import { RouterLink, RouterView, useRouter } from "vue-router";
 import { logout } from "../src/services/authService";
-import AppNavbar from "./components/AppNavBar.vue";
+import AppNavbar from "../src/components/AppNavbar.vue";
 
 const router = useRouter();
 

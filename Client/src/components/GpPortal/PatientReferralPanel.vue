@@ -145,6 +145,13 @@
         </ul>
       </div>
     </div>
+
+    <hr />
+
+    <HospitalMedicalRecordsPanel
+      :patientNumber="selectedPatientNumber"
+      :patientName="selectedPatient?.fullName ?? ''"
+    />
   </section>
 </template>
 
@@ -152,6 +159,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getMyPatients, getReferralsForPatient } from "../../services/gpService";
+import HospitalMedicalRecordsPanel from "../MedicalRecords/HospitalMedicalRecordsPanel.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -167,10 +175,33 @@ const referrals = ref([]);
 const loadingReferrals = ref(false);
 const referralsError = ref("");
 
+function normalizePatient(p) {
+  return {
+    ...p,
+    patientNumber:
+      p.patientNumber ?? p.PatientNumber ?? p.patient_number ?? p.patientnr,
+    firstName: p.firstName ?? p.FirstName ?? p.first_name,
+    prefix: p.prefix ?? p.Prefix ?? p.prefixName ?? p.tussenvoegsel,
+    lastName: p.lastName ?? p.LastName ?? p.last_name,
+    name: p.name ?? p.Name
+  };
+}
+
 function patientLabel(p) {
   const fullName = [p.firstName, p.prefix, p.lastName].filter(Boolean).join(" ");
-  return `${fullName} (${p.patientNumber})`;
+  const label = fullName || p.name || "Patiënt";
+  return `${label} (${p.patientNumber})`;
 }
+
+const selectedPatient = computed(() => {
+  if (!selectedPatientNumber.value) return null;
+  const p = patients.value.find(
+    x => String(x.patientNumber) === String(selectedPatientNumber.value)
+  );
+  if (!p) return null;
+  const fullName = [p.firstName, p.prefix, p.lastName].filter(Boolean).join(" ");
+  return { ...p, fullName: fullName || p.name || "" };
+});
 
 const filteredPatients = computed(() => {
   const q = patientSearch.value.trim().toLowerCase();
@@ -182,7 +213,12 @@ const filteredPatients = computed(() => {
       .join(" ")
       .toLowerCase();
 
-    return fullName.includes(q) || String(p.patientNumber).includes(q);
+    const name = (p.name ?? "").toLowerCase();
+    return (
+      fullName.includes(q) ||
+      name.includes(q) ||
+      String(p.patientNumber).includes(q)
+    );
   });
 });
 
@@ -208,7 +244,9 @@ async function loadPatients() {
   loadingPatients.value = true;
 
   try {
-    patients.value = await getMyPatients({ take: 200 });
+    const data = await getMyPatients({ take: 200 });
+    patients.value = Array.isArray(data) ? data.map(normalizePatient) : [];
+    console.log("GP patients loaded:", patients.value);
     applyPreselectFromQuery();
   } catch (e) {
     patientsError.value =

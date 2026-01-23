@@ -7,6 +7,7 @@ import {
   getTreatments,
   createAppointment as createAppointmentApi
 } from '../../services/appointmentsService'
+import HospitalMedicalRecordsPanel from '../../components/MedicalRecords/HospitalMedicalRecordsPanel.vue'
 
 
 const loading = ref(false)
@@ -58,6 +59,13 @@ const filteredPatients = computed(() => {
     String(p.patientNumber).includes(q) ||
     (p.name ?? '').toLowerCase().includes(q)
   )
+})
+
+const selectedPatient = computed(() => {
+  if (!patientNumber.value) return null
+  return patients.value.find(
+    p => String(p.patientNumber) === String(patientNumber.value)
+  ) ?? null
 })
 
 async function loadOptions() {
@@ -270,6 +278,13 @@ onMounted(loadOptions)
             {{ submitting ? 'Aanmaken…' : 'Maak afspraak' }}
           </button>
         </div>
+      </div>
+
+      <div class="mt-6">
+        <HospitalMedicalRecordsPanel
+          :patientNumber="patientNumber"
+          :patientName="selectedPatient?.name ?? ''"
+        />
       </div>
     </div>
   </div>

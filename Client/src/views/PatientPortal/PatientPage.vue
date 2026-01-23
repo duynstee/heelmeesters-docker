@@ -45,6 +45,10 @@
             :error="appointmentsError"
           />
         </div>
+
+        <div class="rounded-2xl border bg-white p-6 shadow-sm">
+          <MedischDosier />
+        </div>
       </section>
     </div>
   </div>
@@ -60,6 +64,7 @@ import {
 import PatientReferralPicker from "../../components/PatientPortal/PatientReferralPicker.vue";
 import CreateAppointmentFromReferralForm from "../../components/PatientPortal/CreateAppointmentFromReferralForm.vue";
 import MyAppointmentsList from "../../components/PatientPortal/MyAppointmentsList.vue";
+import MedischDosier from "../../components/PatientPortal/medischdosier.vue";
 
 const referrals = ref([]);
 const loadingReferrals = ref(false);

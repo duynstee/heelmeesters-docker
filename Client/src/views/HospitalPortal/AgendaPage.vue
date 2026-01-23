@@ -210,7 +210,6 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- Dokternaam boven de tabel -->
         <div class="mt-6 flex items-center justify-between">
           <div class="text-sm text-slate-700">
             <span class="font-medium">Geselecteerde dokter:</span>
