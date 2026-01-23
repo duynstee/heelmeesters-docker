@@ -1,11 +1,11 @@
+namespace HeelmeestersAPI.Infrastructure;
+
+using Microsoft.EntityFrameworkCore;
+using HeelmeestersAPI.Features.Shared.Auth.Models;
+using HeelmeestersAPI.Features.Shared.Appointments;
+using HeelmeestersAPI.Features.Shared.MedicalRecords;
 using HeelmeestersAPI.Features.HuisartsPortal.Patient.Models;
 using HeelmeestersAPI.Features.HuisartsPortal.Referral.Models;
-using Microsoft.EntityFrameworkCore;
-using HeelmeestersAPI.Features.Shared.Appointments;
-using HeelmeestersAPI.Features.Shared.Auth.Models;
-using HeelmeestersAPI.Features.Shared.MedicalRecords;
-
-namespace HeelmeestersAPI.Infrastructure;
 
 public class AppDbContext : DbContext
 {
@@ -25,9 +25,8 @@ public class AppDbContext : DbContext
     public DbSet<Treatment> Treatments => Set<Treatment>();
     public DbSet<Room> Rooms => Set<Room>();
     public DbSet<AppointmentHospitalStaff> AppointmentHospitalStaff => Set<AppointmentHospitalStaff>();
-
-    // Medical records (uit jouw "current" stuk)
     public DbSet<MedicalRecord> MedicalRecords => Set<MedicalRecord>();
+
     
     public DbSet<GeneralPractitionerHasPatient> GeneralPractitionerHasPatients => Set<GeneralPractitionerHasPatient>();
     public DbSet<Referral> Referrals => Set<Referral>();
@@ -129,6 +128,7 @@ public class AppDbContext : DbContext
             e.Ignore(x => x.EmployeeNumber);
         });
 
+
         modelBuilder.Entity<AppointmentHospitalStaff>(e =>
         {
             e.ToTable("appointment_has_hospital_staff");
@@ -143,7 +143,28 @@ public class AppDbContext : DbContext
             e.ToTable("admins");
             e.HasKey(x => x.UserId);
 
-            e.Property(x => x.UserId).HasColumnName("user_id");
+            e.Property(x => x.UserId)
+                .HasColumnName("user_id");
+        });
+
+        modelBuilder.Entity<MedicalRecord>(e =>
+        {
+            e.ToTable("medical_record");
+            e.HasKey(x => x.LineNumber);
+
+            e.Property(x => x.LineNumber).HasColumnName("line_number");
+            e.Property(x => x.PatientNumber).HasColumnName("patient_number");
+            e.Property(x => x.CreatedOn).HasColumnName("created_on");
+            e.Property(x => x.Description)
+                .HasColumnName("description")
+                .HasColumnType("text")
+                .IsRequired();
+            e.Property(x => x.File).HasColumnName("file");
+
+            e.HasOne<Patient>()
+                .WithMany()
+                .HasForeignKey(x => x.PatientNumber)
+                .HasConstraintName("FK_medical_record_patients");
         });
 
         modelBuilder.Entity<GeneralPractitionerHasPatient>(e =>
@@ -167,9 +188,5 @@ public class AppDbContext : DbContext
             e.Property(x => x.IsUsed).HasColumnName("is_used");
             e.Property(x => x.UsedOn).HasColumnName("used_on");
         });
-        
-        // Let op: MedicalRecord mapping staat hier nog niet.
-        // Als MedicalRecord een aparte EF mapping heeft (config/attributes), is dit ok.
-        // Anders moet je hier ook e.ToTable(...) etc. toevoegen.
     }
 }

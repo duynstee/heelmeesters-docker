@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HeelmeestersAPI.Features.Shared.MedicalRecords
 {
     public interface IMedicalRecordRepository
     {
-        Task<List<MedicalRecord>> GetByPatientIdAsync(int patientId);
+        Task<List<MedicalRecord>> GetByPatientNumberAsync(long patientNumber);
         Task<List<MedicalRecord>> GetAllAsync();
-        Task AddAsync(MedicalRecord record);
-        Task<MedicalRecord?> GetByIdAsync(int id);
+        Task AddAsync(MedicalRecord record, CancellationToken cancellationToken = default);
+        Task<MedicalRecord?> GetByLineNumberAsync(int lineNumber, CancellationToken cancellationToken = default);
     }
 }

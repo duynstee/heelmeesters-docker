@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using HeelmeestersAPI.Features.Shared.Appointments;
-
-using System.Security.Claims;
+﻿using HeelmeestersAPI.Features.Shared.Appointments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using HeelmeestersAPI.Features.Shared.Appointments;
 
 namespace HeelmeestersAPI.Features.ZiekenhuisPortal.Appointments
 {
@@ -27,7 +22,7 @@ namespace HeelmeestersAPI.Features.ZiekenhuisPortal.Appointments
             try
             {
                 DateTime weekEnd = weekStart.AddDays(7);
-                
+
 
                 var appointments = await _service.GetAppointmentsForDoctorInRangeAsync(employeeNumber, weekStart, weekEnd);
 
@@ -111,7 +106,7 @@ namespace HeelmeestersAPI.Features.ZiekenhuisPortal.Appointments
                 return BadRequest(new { message = ex.Message });
             }
         }
-        
+
         [HttpGet("doctors")]
         public async Task<IActionResult> GetDoctors()
         {

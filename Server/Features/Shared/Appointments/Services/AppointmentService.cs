@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,7 +40,7 @@ namespace HeelmeestersAPI.Features.Shared.Appointments.Services
 
             if (startTime.Date != endTime.Date)
                 throw new ArgumentException("Afspraak moet op dezelfde dag beginnen en eindigen.");
-            
+
             // Check beschikbaarheid dokter (overlap)
             bool available = await _repo.IsDoctorAvailable(employeeNumber, startTime, endTime);
             if (!available)
@@ -77,8 +77,8 @@ namespace HeelmeestersAPI.Features.Shared.Appointments.Services
 
         public Task<List<Appointment>> GetAppointmentsForPatientAsync(long patientNumber)
         {
-            
-            
+
+
             return _repo.GetAllForPatientAsync(patientNumber);
         }
 
@@ -91,7 +91,7 @@ namespace HeelmeestersAPI.Features.Shared.Appointments.Services
         {
             return _repo.GetTreatmentsAsync();
         }
-        
+
         public Task<List<DoctorOptionDto>> GetDoctorOptionsAsync()
         {
             return _repo.GetDoctorOptionsAsync();
@@ -106,7 +106,7 @@ namespace HeelmeestersAPI.Features.Shared.Appointments.Services
         {
             return _repo.GetRoomOptionsAsync();
         }
-        
+
         public async Task<long> GetPatientNumberForUserAsync(int userId)
         {
             var pn = await _repo.GetPatientNumberForUserAsync(userId);
@@ -146,7 +146,7 @@ namespace HeelmeestersAPI.Features.Shared.Appointments.Services
 
             return appointment;
         }
-        
+
         public async Task<List<ReferralDto>> GetActiveReferralsForLoggedInPatientAsync(int userId)
         {
             var patientNumber = await GetPatientNumberForUserAsync(userId);

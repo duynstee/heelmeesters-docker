@@ -1,4 +1,4 @@
-﻿namespace HeelmeestersAPI.Features.Shared.Appointments
+namespace HeelmeestersAPI.Features.Shared.Appointments
 {
     public class Appointment
     {

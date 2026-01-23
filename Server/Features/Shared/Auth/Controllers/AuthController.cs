@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
     public IActionResult Login([FromBody] LoginDto dto)
     {
         var token = _authService.Authenticate(dto.Username, dto.Password);
-        if (token == null) return Unauthorized("Foute combinatie inloggegevens");
+        if (token == null) return Unauthorized();
 
         return Ok(new { Token = token });
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using HeelmeestersAPI.Features.Shared.Appointments.Dtos;
@@ -27,11 +27,11 @@ namespace HeelmeestersAPI.Features.Shared.Appointments
 
         // AppointmentTypes -> Treatments
         Task<List<Treatment>> GetTreatmentsAsync();
-        
+
         Task<List<DoctorOptionDto>> GetDoctorOptionsAsync();
         Task<List<PatientOptionDto>> GetPatientOptionsAsync();
         Task<List<RoomOptionDto>> GetRoomOptionsAsync();
-        
+
         Task<long> GetPatientNumberForUserAsync(int userId);
 
         Task<Appointment> CreatePatientAppointmentFromReferralAsync(

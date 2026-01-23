@@ -12,23 +12,21 @@ using HeelmeestersAPI.Features.Shared.Appointments;
 using HeelmeestersAPI.Features.Shared.Appointments.Interfaces;
 using HeelmeestersAPI.Features.Shared.Appointments.Repositories;
 using HeelmeestersAPI.Features.Shared.Appointments.Services;
+// [ADDED - afspraak-maken feature] Patient appointment booking services
+// using HeelmeestersAPI.Features.PatientPortal.Appointments;
 using HeelmeestersAPI.Features.Shared.Auth.Interfaces;
 using HeelmeestersAPI.Features.Shared.Auth.Models;
 using HeelmeestersAPI.Features.Shared.Auth.Repositories;
+using HeelmeestersAPI.Features.Shared.Auth.Services;
 using HeelmeestersAPI.Features.Shared.MedicalRecords;
 using HeelmeestersAPI.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.HttpOverrides; // <-- nodig voor forwarded headers
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Logging (toevoeging)
-builder.Services.AddLogging(builder =>
-    builder.AddDebug()
-        .AddConsole()
-        .SetMinimumLevel(LogLevel.Information));
+Console.WriteLine(builder.Configuration.GetConnectionString("DefaultConnection"));
 
 // Bind JwtSettings (voor elders in je app)
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
@@ -70,15 +68,9 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// EF Core (aangepast: eerst env var proberen, anders appsettings)
-var connectionString =
-    Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
-
-Console.WriteLine($"Using connection string: {connectionString}");
-
+// EF Core
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Controllers
 builder.Services.AddControllers();
@@ -88,9 +80,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowViteDevServer", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "https://localhost:5173")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
@@ -137,21 +132,9 @@ builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IPatientService, PatientService>();
 builder.Services.AddScoped<IReferralRepository, ReferralRepository>();
 builder.Services.AddScoped<IReferralService, ReferralService>();
+builder.Services.AddScoped<IPatientIdentityService, PatientIdentityService>();
 
 var app = builder.Build();
-
-// Migraties automatisch uitvoeren bij opstart (toevoeging)
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
-
-// Forwarded headers (toevoeging, nodig achter nginx/proxy)
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
 
 // Swagger altijd aan (handig tijdens debuggen)
 app.UseSwagger();
@@ -161,11 +144,10 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-// HTTPS redirection UIT achter proxy (belangrijk)
-// if (!app.Environment.IsDevelopment())
-// {
-//     app.UseHttpsRedirection();
-// }
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowViteDevServer");
 
@@ -174,3 +156,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.Run();
+
